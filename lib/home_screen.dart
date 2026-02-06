@@ -1,18 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:micro_ecommerce/product_item_model.dart';
+import 'package:micro_ecommerce/screens/product_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+import 'screens/cart_screen.dart';
+import 'screens/profile_screen.dart';
+import 'screens/wishlist_screen.dart';
+
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _activeIndex = 0;
+
+  List<String> titles = ['Home', 'Wishlist', 'Cart', 'Profile'];
+
+  final List<Widget> body = const [
+    ProductScreen(),
+    WishlistScreen(),
+    CartScreen(),
+    ProfileScreen(),
+  ];
+
+  @override
   Widget build(BuildContext context) {
-    print('GUBA :: Size ${MediaQuery.sizeOf(context).width}');
-    // adapted
-    // Adaptive Widgets
     return Scaffold(
-      drawer: Drawer(),
+      backgroundColor: Colors.white,
+      drawer: const Drawer(),
       appBar: AppBar(
-        title: Text('Smart Shop'),
+        backgroundColor: Colors.white,
+
+        title: const Text('Smart Shop'),
         // leading: Icon(Icons.arrow_back),
         actions: [
           IconButton(
@@ -29,112 +49,43 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Column(
-        spacing: 10,
-        children: [
-          // Search Bar
-          _buildSearchBar(),
+      body: body[_activeIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.grey,
+        showUnselectedLabels: false,
+        type: BottomNavigationBarType.fixed,
+        // backgroundColor: Colors.white,
+        currentIndex: _activeIndex,
+        onTap: (index) {
+          // حماصة العيل الرخم
+          // setState
+          print('GUBA :: current index $index');
 
-          // Filter Buttons
-          Row(
-            spacing: 10,
-            children: [
-              SizedBox(width: 10),
-              _buildFilterButton('All'),
-              _buildFilterButton('Featured'),
-              _buildFilterButton('New'),
-            ],
+          setState(() {
+            _activeIndex = index;
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            label: 'Home',
           ),
-
-          // List of Products
-
-          // Grid
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 20,
-                  crossAxisSpacing: 20,
-                  childAspectRatio: 0.85,
-                ),
-                itemCount: ProductItemModel.productsList.length,
-                itemBuilder: (context, i) {
-                  // 80% daily work.
-                  // Loading per need
-                  return _buildProductItem(
-                    product: ProductItemModel.productsList[i],
-                  );
-                },
-                // children: [
-                //   for (int i = 0; i < ProductItemModel.productsList.length; i++)
-                //     _buildProductItem(
-                //       product: ProductItemModel.productsList[i],
-                //     ),
-                // ],
-              ),
-            ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite_outline_rounded),
+            label: 'Wishlist',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart_outlined),
+            label: 'Cart',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_2_outlined),
+            label: 'Profile',
           ),
         ],
       ),
     );
   }
-
-  //  Function Widget
-  Widget _buildFilterButton(String text) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-      child: Text(text, style: TextStyle(color: Colors.black)),
-    );
-  }
-
-  Widget _buildSearchBar() {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16),
-      child: TextField(
-        decoration: InputDecoration(
-          fillColor: Colors.grey.shade200,
-          filled: true,
-          hintText: 'Search',
-          // labelText: 'Enter you search',
-          // helperText: 'Your password should contain 8 characters',
-          prefixIcon: Icon(Icons.search),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          // suffixIcon: Icon(Icons.visibility),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProductItem({required ProductItemModel product}) {
-    return Column(
-      spacing: 2,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ClipRRect(
-          // borderRadius: BorderRadius.circular(12),
-          child: Container(
-            height: 172,
-            width: 172,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade100,
-              borderRadius: BorderRadius.circular(12),
-              image: DecorationImage(image: AssetImage(product.image)),
-            ),
-            // child: Image.asset(product.image),
-          ),
-        ),
-        Text(product.name),
-        Text('${product.price} USD'),
-      ],
-    );
-  }
 }
-
-// Boilerplate code

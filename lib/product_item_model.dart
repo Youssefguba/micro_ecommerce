@@ -2,8 +2,14 @@ class ProductItemModel {
   final String name;
   final String image;
   final double price;
+  bool isFavourite;
 
-  ProductItemModel(this.name, this.image, this.price);
+  ProductItemModel(
+    this.name,
+    this.image,
+    this.price, {
+    this.isFavourite = false,
+  });
 
   static List<ProductItemModel> productsList = [
     ProductItemModel('Sweater', 'assets/products/sweater.png', 100),
