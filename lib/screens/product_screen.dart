@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:micro_ecommerce/product_item_model.dart';
 
+import 'product_details_screen.dart';
+
 class ProductScreen extends StatefulWidget {
   const ProductScreen({super.key});
 
@@ -9,7 +11,6 @@ class ProductScreen extends StatefulWidget {
 }
 
 class _ProductScreenState extends State<ProductScreen> {
-
   @override
   Widget build(BuildContext context) {
     // adapted
@@ -42,15 +43,14 @@ class _ProductScreenState extends State<ProductScreen> {
                 crossAxisCount: 2,
                 mainAxisSpacing: 20,
                 crossAxisSpacing: 20,
-                childAspectRatio: 0.85,
+                childAspectRatio: 0.8,
               ),
               itemCount: ProductItemModel.productsList.length,
-              itemBuilder: (context, i) {
+              itemBuilder: (context, index) {
+                final item = ProductItemModel.productsList[index];
                 // 80% daily work.
                 // Loading per need
-                return _buildProductItem(
-                  product: ProductItemModel.productsList[i],
-                );
+                return _buildProductItem(product: item);
               },
               // children: [
               //   for (int i = 0; i < ProductItemModel.productsList.length; i++)
@@ -102,55 +102,63 @@ class _ProductScreenState extends State<ProductScreen> {
 
     // rtl = Right to Left
     // ltr = Left to Right
-    return Stack(
-      alignment: AlignmentDirectional.topEnd,
-      children: [
-        Column(
-          spacing: 2,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              // borderRadius: BorderRadius.circular(12),
-              child: Container(
-                height: 172,
-                width: 172,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(12),
-                  image: DecorationImage(image: AssetImage(product.image)),
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ProductDetailsScreen(product: product),
+          ),
+        );
+      },
+      child: Stack(
+        alignment: AlignmentDirectional.topEnd,
+        children: [
+          Column(
+            spacing: 2,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                // borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  height: 172,
+                  width: 172,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                    image: DecorationImage(image: AssetImage(product.image)),
+                  ),
+                  // child: Image.asset(product.image),
                 ),
-                // child: Image.asset(product.image),
               ),
-            ),
-            Text(product.name),
-            Text('${product.price} USD'),
-          ],
-        ),
+              Text(product.name),
+              Text('${product.price} USD'),
+            ],
+          ),
 
-        IconButton(
-          onPressed: () {
-            print('Item added to cart!');
-            setState(() {
-              // if (_isFavourite) {
-              //   _isFavourite = false;
-              // } else {
-              //   _isFavourite = true;
-              // }
+          IconButton(
+            onPressed: () {
+              print('Item added to cart!');
+              setState(() {
+                // if (_isFavourite) {
+                //   _isFavourite = false;
+                // } else {
+                //   _isFavourite = true;
+                // }
 
-              product.isFavourite = !product.isFavourite;
-            });
-          },
-          icon: product.isFavourite
-              ? Icon(Icons.favorite, color: Colors.red)
-              : Icon(Icons.favorite_outline),
-        ),
-      ],
+                product.isFavourite = !product.isFavourite;
+              });
+            },
+            icon: product.isFavourite
+                ? Icon(Icons.favorite, color: Colors.red)
+                : Icon(Icons.favorite_outline),
+          ),
+        ],
+      ),
     );
   }
 }
 
 // Boilerplate code
-
 
 // Column
 // Row

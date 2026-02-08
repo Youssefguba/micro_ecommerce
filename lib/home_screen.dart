@@ -31,7 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
       drawer: const Drawer(),
       appBar: AppBar(
         backgroundColor: Colors.white,
-
         title: const Text('Smart Shop'),
         // leading: Icon(Icons.arrow_back),
         actions: [

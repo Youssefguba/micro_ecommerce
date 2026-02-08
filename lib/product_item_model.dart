@@ -2,6 +2,7 @@ class ProductItemModel {
   final String name;
   final String image;
   final double price;
+  int quantity;
   bool isFavourite;
 
   ProductItemModel(
@@ -9,6 +10,7 @@ class ProductItemModel {
     this.image,
     this.price, {
     this.isFavourite = false,
+    this.quantity = 1,
   });
 
   static List<ProductItemModel> productsList = [
