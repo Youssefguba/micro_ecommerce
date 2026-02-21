@@ -1,4 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:micro_ecommerce/cubits/category_products_cubit.dart';
 import 'package:micro_ecommerce/product_item_model.dart';
 
 import 'product_details_screen.dart';
@@ -11,8 +14,19 @@ class ProductScreen extends StatefulWidget {
 }
 
 class _ProductScreenState extends State<ProductScreen> {
+  CategoryType? selectedType;
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<CategoryProductsCubit>().loadData();
+  }
+
   @override
   Widget build(BuildContext context) {
+    // context.read<CategoryProductsCubit>().loadData();
+
     // adapted
     // Adaptive Widgets
     return Column(
@@ -26,9 +40,9 @@ class _ProductScreenState extends State<ProductScreen> {
           spacing: 10,
           children: [
             SizedBox(width: 10),
-            _buildFilterButton('All'),
-            _buildFilterButton('Featured'),
-            _buildFilterButton('New'),
+            _buildFilterButton('All', null),
+            _buildFilterButton('Featured', CategoryType.featured),
+            _buildFilterButton('New', CategoryType.newProduct),
           ],
         ),
 
@@ -38,26 +52,45 @@ class _ProductScreenState extends State<ProductScreen> {
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 20,
-                crossAxisSpacing: 20,
-                childAspectRatio: 0.8,
-              ),
-              itemCount: ProductItemModel.productsList.length,
-              itemBuilder: (context, index) {
-                final item = ProductItemModel.productsList[index];
-                // 80% daily work.
-                // Loading per need
-                return _buildProductItem(product: item);
+            child: BlocBuilder<CategoryProductsCubit, CategoryProductsState>(
+              builder: (context, state) {
+                if (state is CategoryProductsLoading) {
+                  return Center(child: CircularProgressIndicator());
+                }
+
+                if (state is CategoryProductsSuccess) {
+                  final products = state.productsList;
+                  return GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 20,
+                      crossAxisSpacing: 20,
+                      childAspectRatio: 0.75,
+                    ),
+                    itemCount: products.length,
+                    itemBuilder: (context, index) {
+                      final item = products[index];
+                      // 80% daily work.
+                      // Loading per need
+                      return _buildProductItem(product: item);
+                    },
+                    // children: [
+                    //   for (int i = 0; i < ProductItemModel.productsList.length; i++)
+                    //     _buildProductItem(
+                    //       product: ProductItemModel.productsList[i],
+                    //     ),
+                    // ],
+                  );
+                }
+
+                if (state is CategoryProductsEmpty) {
+                  return Center(
+                    child: Text('You cant find this product in your search!'),
+                  );
+                }
+
+                return Center(child: Text('There is no data!'));
               },
-              // children: [
-              //   for (int i = 0; i < ProductItemModel.productsList.length; i++)
-              //     _buildProductItem(
-              //       product: ProductItemModel.productsList[i],
-              //     ),
-              // ],
             ),
           ),
         ),
@@ -66,15 +99,31 @@ class _ProductScreenState extends State<ProductScreen> {
   }
 
   //  Function Widget
-  Widget _buildFilterButton(String text) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(12),
+  Widget _buildFilterButton(String text, CategoryType? type) {
+    return GestureDetector(
+      onTap: () {
+        context.read<CategoryProductsCubit>().onFilterData(type);
+
+        setState(() {
+          selectedType = type;
+        });
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: selectedType == type
+              ? Colors.deepPurpleAccent
+              : Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: selectedType == type ? Colors.white : Colors.black,
+          ),
+        ),
       ),
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-      child: Text(text, style: TextStyle(color: Colors.black)),
     );
   }
 
@@ -82,6 +131,10 @@ class _ProductScreenState extends State<ProductScreen> {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16),
       child: TextField(
+        controller: _searchController,
+        onChanged: (text) {
+          context.read<CategoryProductsCubit>().search(text);
+        },
         decoration: InputDecoration(
           fillColor: Colors.white,
           filled: true,

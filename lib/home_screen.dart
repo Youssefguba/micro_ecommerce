@@ -85,6 +85,18 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+      // bottomNavigationBar: CurvedNavigationBar(
+      //   backgroundColor: Colors.black,
+      //     buttonBackgroundColor: Colors.white,
+      //   items: <Widget>[
+      //     Icon(Icons.add, size: 30),
+      //     Icon(Icons.list, size: 30),
+      //     Icon(Icons.compare_arrows, size: 30),
+      //   ],
+      //   onTap: (index) {
+      //     //Handle button tap
+      //   },
+      // ),
     );
   }
 }
