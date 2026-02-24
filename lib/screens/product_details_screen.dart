@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:micro_ecommerce/product_item_model.dart';
+import 'package:micro_ecommerce/models/product_item_model.dart';
 
 // Widget
 class ProductDetailsScreen extends StatefulWidget {

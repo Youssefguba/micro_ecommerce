@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 
-import '../product_item_model.dart';
+import '../models/product_item_model.dart';
 
 part 'category_products_state.dart';
 
@@ -14,7 +14,7 @@ class CategoryProductsCubit extends Cubit<CategoryProductsState> {
     emit(CategoryProductsLoading());
     // Call Data from server
     // Simulation
-    await Future.delayed(Duration(seconds: 2));
+    await Future.delayed(Duration(milliseconds: 500));
 
     if (productsList.isEmpty) {
       emit(CategoryProductsFailed());
@@ -43,6 +43,8 @@ class CategoryProductsCubit extends Cubit<CategoryProductsState> {
       return;
     }
 
+    // Search for products with start of character
+    // ببحث عن المنتجات بأول حرف منها
     final items = productsList
         .where(
           (item) =>
@@ -57,7 +59,7 @@ class CategoryProductsCubit extends Cubit<CategoryProductsState> {
 
     // 1. if list is empty? -> Handle Logic (DONE)
     // 2. if string is capital or small (DONE)
-    // 3. If string is empty return all list
+    // 3. If string is empty return all listw
 
     emit(CategoryProductsSuccess(items));
   }

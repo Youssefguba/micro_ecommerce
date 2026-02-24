@@ -17,6 +17,20 @@ class ProductItemModel {
     this.quantity = 1,
   });
 
+
+
+  ProductItemModel copyWith({int q = 1}) {
+    return  ProductItemModel(
+      name,
+      image,
+      price,
+      category: category,
+      isFavourite: isFavourite,
+      quantity: q
+    );
+  }
+
+
   static List<ProductItemModel> productsList = [
     ProductItemModel(
       'Sweater',
@@ -55,4 +69,9 @@ class ProductItemModel {
       category: CategoryType.newProduct,
     ),
   ];
+
+  @override
+  String toString() {
+    return 'name $name, qu $quantity';
+  }
 }

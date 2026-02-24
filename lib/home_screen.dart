@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:micro_ecommerce/screens/product_screen.dart';
 
+import 'blocs/cart_bloc/cart_bloc.dart';
 import 'screens/cart_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/wishlist_screen.dart';
@@ -66,20 +68,22 @@ class _HomeScreenState extends State<HomeScreen> {
             _activeIndex = index;
           });
         },
-        items: const [
-          BottomNavigationBarItem(
+        items: [
+          const BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
             label: 'Home',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.favorite_outline_rounded),
             label: 'Wishlist',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart_outlined),
+            icon: Badge.count(
+                count: context.watch<CartBloc>().state.cartItems.length,
+                child: const Icon(Icons.shopping_cart_outlined)),
             label: 'Cart',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.person_2_outlined),
             label: 'Profile',
           ),

@@ -2,8 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:micro_ecommerce/cubits/category_products_cubit.dart';
-import 'package:micro_ecommerce/product_item_model.dart';
+import 'package:micro_ecommerce/models/product_item_model.dart';
 
+import '../blocs/cart_bloc/cart_bloc.dart';
 import 'product_details_screen.dart';
 
 class ProductScreen extends StatefulWidget {
@@ -29,72 +30,85 @@ class _ProductScreenState extends State<ProductScreen> {
 
     // adapted
     // Adaptive Widgets
-    return Column(
-      spacing: 10,
-      children: [
-        // Search Bar
-        _buildSearchBar(),
+    return BlocListener<CartBloc, CartState>(
+      listener: (context, state) {
+        if (state.status == CartStatus.success) {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Item Added to Cart'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      },
+      child: Column(
+        spacing: 10,
+        children: [
+          // Search Bar
+          _buildSearchBar(),
 
-        // Filter Buttons
-        Row(
-          spacing: 10,
-          children: [
-            SizedBox(width: 10),
-            _buildFilterButton('All', null),
-            _buildFilterButton('Featured', CategoryType.featured),
-            _buildFilterButton('New', CategoryType.newProduct),
-          ],
-        ),
+          // Filter Buttons
+          Row(
+            spacing: 10,
+            children: [
+              SizedBox(width: 10),
+              _buildFilterButton('All', null),
+              _buildFilterButton('Featured', CategoryType.featured),
+              _buildFilterButton('New', CategoryType.newProduct),
+            ],
+          ),
 
-        // List of Products
+          // List of Products
 
-        // Grid
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: BlocBuilder<CategoryProductsCubit, CategoryProductsState>(
-              builder: (context, state) {
-                if (state is CategoryProductsLoading) {
-                  return Center(child: CircularProgressIndicator());
-                }
+          // Grid
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: BlocBuilder<CategoryProductsCubit, CategoryProductsState>(
+                builder: (context, state) {
+                  if (state is CategoryProductsLoading) {
+                    return Center(child: CircularProgressIndicator());
+                  }
 
-                if (state is CategoryProductsSuccess) {
-                  final products = state.productsList;
-                  return GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 20,
-                      crossAxisSpacing: 20,
-                      childAspectRatio: 0.75,
-                    ),
-                    itemCount: products.length,
-                    itemBuilder: (context, index) {
-                      final item = products[index];
-                      // 80% daily work.
-                      // Loading per need
-                      return _buildProductItem(product: item);
-                    },
-                    // children: [
-                    //   for (int i = 0; i < ProductItemModel.productsList.length; i++)
-                    //     _buildProductItem(
-                    //       product: ProductItemModel.productsList[i],
-                    //     ),
-                    // ],
-                  );
-                }
+                  if (state is CategoryProductsSuccess) {
+                    final products = state.productsList;
+                    return GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 20,
+                        crossAxisSpacing: 20,
+                        childAspectRatio: 0.75,
+                      ),
+                      itemCount: products.length,
+                      itemBuilder: (context, index) {
+                        final item = products[index];
+                        // 80% daily work.
+                        // Loading per need
+                        return _buildProductItem(product: item);
+                      },
+                      // children: [
+                      //   for (int i = 0; i < ProductItemModel.productsList.length; i++)
+                      //     _buildProductItem(
+                      //       product: ProductItemModel.productsList[i],
+                      //     ),
+                      // ],
+                    );
+                  }
 
-                if (state is CategoryProductsEmpty) {
-                  return Center(
-                    child: Text('You cant find this product in your search!'),
-                  );
-                }
+                  if (state is CategoryProductsEmpty) {
+                    return Center(
+                      child: Text('You cant find this product in your search!'),
+                    );
+                  }
 
-                return Center(child: Text('There is no data!'));
-              },
+                  return Center(child: Text('There is no data!'));
+                },
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -190,20 +204,9 @@ class _ProductScreenState extends State<ProductScreen> {
 
           IconButton(
             onPressed: () {
-              print('Item added to cart!');
-              setState(() {
-                // if (_isFavourite) {
-                //   _isFavourite = false;
-                // } else {
-                //   _isFavourite = true;
-                // }
-
-                product.isFavourite = !product.isFavourite;
-              });
+              context.read<CartBloc>().add(AddToCartEvent(product));
             },
-            icon: product.isFavourite
-                ? Icon(Icons.favorite, color: Colors.red)
-                : Icon(Icons.favorite_outline),
+            icon: Icon(Icons.add_shopping_cart),
           ),
         ],
       ),
